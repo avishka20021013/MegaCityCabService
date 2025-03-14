@@ -81,7 +81,7 @@ public class LoginAndRegistrationController {
             @RequestParam String password,
             RedirectAttributes redirectAttributes) {
 
-        if ("admin".equals(username) && " ".equals(password)) {
+        if ("admin".equals(username) && "1234".equals(password)) {
             return "redirect:/admin/dashboard";
         } else {
             if (!clientRepository.usernameExists(username)) {
