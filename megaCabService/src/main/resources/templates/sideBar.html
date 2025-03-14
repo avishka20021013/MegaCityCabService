@@ -1,0 +1,110 @@
+<div th:fragment="sidebar">
+    <style>
+        .sidebar {
+            width: 250px;
+            background-color: #343a40;
+            color: #fff;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            Z-index:2;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .sidebar.hidden {
+            transform: translateX(-100%);
+        }
+
+        .sidebar .logo {
+            padding: 20px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            background-color: #212529;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .sidebar .nav {
+            flex-grow: 1;
+            padding: 10px 0;
+        }
+
+        .sidebar .nav-link {
+            color: #fff;
+            padding: 12px 20px;
+            display: block;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background-color 0.3s, padding-left 0.3s;
+        }
+
+        .sidebar .nav-link:hover {
+            background-color: #007bff;
+            padding-left: 25px;
+        }
+
+        .sidebar .footer {
+            padding: 15px;
+            text-align: center;
+            background-color: #212529;
+            font-size: 14px;
+        }
+
+        /* Toggle Button */
+        .toggle-btn {
+            background: #007bff;
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            position: absolute;
+            top: 15px;
+            left: 260px;
+            cursor: pointer;
+            border-radius: 5px;
+            z-index: 1000;
+            transition: left 0.3s ease-in-out;
+        }
+
+        .sidebar.hidden + .toggle-btn {
+            left: 15px;
+        }
+
+        .toggle-btn:hover {
+            background: #0056b3;
+        }
+    </style>
+
+    <div class="sidebar" id="sidebar">
+        <div class="logo">Mega City Cabs</div>
+        <div class="nav">
+            <a href="/admin/dashboard" class="nav-link">🏠 Home</a>
+            <a href="/cabs" class="nav-link">🚖 Manage Cabs</a>
+            <a href="/clients" class="nav-link">👥 Manage Clients</a>
+            <a href="/booking/allBookings" class="nav-link">📅 Manage Bookings</a>
+            <a href="/cabCategory" class="nav-link">📂 Manage Cab Categories</a>
+            <a href="/taxDiscount" class="nav-link">💰 Tax and Discount</a>
+            <a href="#" class="nav-link" onclick="finishAndGoBack()">🚪 Logout</a>
+        </div>
+        <div class="footer">
+            <p>&copy; 2024 Mega City Cabs</p>
+        </div>
+    </div>
+
+    <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+
+    <script>
+        function toggleSidebar() {
+            let sidebar = document.getElementById("sidebar");
+            sidebar.classList.toggle("hidden");
+        }
+        function finishAndGoBack() {
+            window.location.replace('/');
+            window.history.pushState(null, "", "/"); 
+        }
+    </script>
+</div>

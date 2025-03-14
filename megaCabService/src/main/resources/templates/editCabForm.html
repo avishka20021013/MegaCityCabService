@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Cab - Mega City Cabs</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            background: url('/images/flat-lay-multicolored-paper-geometry.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .content {
+            padding: 30px;
+            flex-grow: 1;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            transition: margin-left 0.3s ease-in-out;
+            width: 100%;
+            max-width: 600px;
+            margin: auto;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="content">
+        <h2 class="text-primary text-center">Edit Cab</h2>
+
+        <div th:if="${error}" class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong><p th:text="${error}"></p></strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <form action="/cabs/update" method="post" enctype="multipart/form-data" class="p-3 border rounded bg-light">
+            <input type="hidden" name="cabID" th:value="${cab?.cabID}">
+
+            <div class="mb-3">
+                <label class="form-label">Cab Number</label>
+                <input type="text" class="form-control" name="cabNumber" th:value="${cab?.cabNumber}" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Model</label>
+                <input type="text" class="form-control" name="model" th:value="${cab?.model}" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Category</label>
+                <select class="form-select" name="category" required>
+                    <option value="">Select Category</option>
+                    <option th:each="cat : ${categories}" th:value="${cat}" th:selected="${cat == cab?.category}" th:text="${cat}"></option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Seats</label>
+                <input type="number" class="form-control" name="seats" th:value="${cab?.seats}" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Driver Name</label>
+                <input type="text" class="form-control" name="driverName" th:value="${cab?.driverName}" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Driver Contact</label>
+                <input type="text" class="form-control" name="driverContact" th:value="${cab?.driverContact}" required>
+            </div>
+
+            <div class="mb-3" th:if="${cab?.imageUrl}">
+                <label class="form-label">Current Image</label>
+                <br>
+                <img th:src="@{'/uploads/' + ${cab.imageUrl}}" alt="Cab Image" style="max-width: 150px; height: auto;">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Upload New Image</label>
+                <input type="file" class="form-control" name="file">
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-success">Save</button>
+                <a href="#" class="btn btn-secondary ms-2" onclick="finishAndGoBack()">Back</a>
+            </div>
+        </form>
+    </div>
+<script>
+    function finishAndGoBack() {
+        window.location.replace('/cabs');
+        window.history.pushState(null, "", "/cabs"); 
+    }
+</script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

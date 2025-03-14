@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookings</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        body {
+            background-color: #f4f7fa;
+            font-family: Arial, sans-serif;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background-color: #007bff;
+            color: white;
+            border-radius: 15px 15px 0 0;
+            padding: 20px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .table th {
+            background-color: #007bff;
+            color: white;
+        }
+        .table td, .table th {
+            text-align: center;
+        }
+        .form-select, .form-control {
+            border-radius: 10px;
+        }
+        .invalid-feedback {
+            display: block;
+        }
+        .card-body {
+            padding: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container mt-5">
+        <div class="card shadow-lg">
+            <div class="card-header text-center">
+                <h2>Welcome, <span th:text="${sessionData.loggedClient.firstName}"></span>!</h2>
+            </div>
+
+            <div class="card-body">
+                <!-- Filter Form -->
+                <form method="get" action="/booking/filter">
+                    <div class="mb-4">
+                        <label for="category" class="form-label">Select Category</label>
+                        <select class="form-select" name="category" id="category" required>
+                            <option value="">Select Category</option>
+                            <option th:each="cat : ${categories}" 
+                                    th:value="${cat}" 
+                                    th:text="${cat}" 
+                                    th:selected="${cat == selectedCategory}"></option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="dates" class="form-label">Select Dates</label>
+                        <input type="text" id="dates" name="dates" class="form-control" 
+                               placeholder="Select multiple dates" required 
+                               th:value="${selectedDates}" />
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+        			<a href="" class="btn btn-secondary" onclick="finishAndGoBack()">Back</a>
+        
+    </div>
+                </form>
+
+                <!-- Available Cabs Table -->
+                <div class="mt-4">
+                    <h4>Available Cabs</h4>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>Cab Image</th>
+                                <th>Cab Number</th>
+                                <th>Model</th>
+                                <th>Category</th>
+                                <th>Seats</th>
+                                <th>Driver Name</th>
+                                <th>Driver Contact</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="cab : ${filteredCabs}"
+                                th:attr="data-cab-id=${cab.cabID}, 
+                                         data-cab-number=${cab.cabNumber}, 
+                                         data-model=${cab.model}, 
+                                         data-category=${cab.category}, 
+                                         data-seats=${cab.seats}, 
+                                         data-owner-name=${cab.driverName}, 
+                                         data-owner-contact=${cab.driverContact}" 
+                                onclick="handleCabClick(this)">
+                                <td>
+                                    <img th:src="@{'/uploads/' + ${cab.imageUrl}}" alt="Cab Image" width="100">
+                                </td>
+                                <td th:text="${cab.cabNumber}"></td>
+                                <td th:text="${cab.model}"></td>
+                                <td th:text="${cab.category}"></td>
+                                <td th:text="${cab.seats}"></td>
+                                <td th:text="${cab.driverName}"></td>
+                                <td th:text="${cab.driverContact}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const dateInput = document.getElementById('dates');
+            const selectedDates = dateInput.value ? dateInput.value.split(",") : [];
+
+            flatpickr(dateInput, {
+                mode: "multiple",
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                defaultDate: selectedDates,
+                onClose: function(selectedDates, dateStr, instance) {
+                    if (selectedDates.length > 1) {
+                        selectedDates.sort((a, b) => new Date(a) - new Date(b)) 
+                        for (let i = 1; i < selectedDates.length; i++) {
+                            let prevDate = new Date(selectedDates[i - 1]);
+                            let currDate = new Date(selectedDates[i]);
+                            let diffDays = (currDate - prevDate) / (1000 * 60 * 60 * 24);
+                            
+                            if (diffDays !== 1) { 
+                                alert("Please select only consecutive dates!");
+                                instance.clear();
+                                return;
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+        function handleCabClick(element) {
+            const cabId = element.getAttribute('data-cab-id');
+            const cabNumber = element.getAttribute('data-cab-number');
+            const cabModel = element.getAttribute('data-model');
+            const category = element.getAttribute('data-category');
+            const seats = element.getAttribute('data-seats');
+            const driverName = element.getAttribute('data-owner-name'); 
+            const driverContact = element.getAttribute('data-owner-contact');  
+            const imageUrl = element.querySelector("img").getAttribute("src");
+            const dates = document.getElementById('dates').value;
+
+            window.location.href = `/booking/new?cabID=${cabId}&cabNumber=${cabNumber}&cabModel=${cabModel}&category=${category}&seats=${seats}&driverName=${driverName}&driverContact=${driverContact}&imageUrl=${encodeURIComponent(imageUrl)}&dates=${encodeURIComponent(dates)}`;
+        }
+        
+        function finishAndGoBack() {
+            window.location.replace('/user/clientHome');
+            window.history.pushState(null, "", "/user/clientHome"); 
+        }
+    </script>
+
+</body>
+</html>
